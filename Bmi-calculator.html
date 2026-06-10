@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aesthetic BMI Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .calculator-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            text-align: center;
+        }
+
+        h1 {
+            color: #4a4a4a;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        p.subtitle {
+            color: #777;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            outline: none;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        input:focus {
+            border-color: #a18cd1;
+            box-shadow: 0 0 0 4px rgba(161, 140, 209, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 1rem;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(161, 140, 209, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .result-container {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 16px;
+            background: #f8f9fa;
+            display: none;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .bmi-value {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .bmi-status {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+            padding: 6px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            color: white;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator-card">
+        <h1>BMI Calculator</h1>
+        <p class="subtitle">Check your body mass index easily</p>
+
+        <div class="input-group">
+            <label for="weight">Weight (kg)</label>
+            <input type="number" id="weight" placeholder="e.g., 70" min="1" step="0.1">
+        </div>
+
+        <div class="input-group">
+            <label for="height">Height (cm)</label>
+            <input type="number" id="height" placeholder="e.g., 175" min="1" step="0.1">
+        </div>
+
+        <p class="error" id="error-msg">Please enter valid positive numbers for both fields.</p>
+
+        <button onclick="calculateBMI()">Calculate BMI</button>
+
+        <div class="result-container" id="result-container">
+            <div>Your BMI is</div>
+            <div class="bmi-value" id="bmi-value">0.0</div>
+            <div class="bmi-status" id="bmi-status">Normal</div>
+        </div>
+    </div>
+
+    <script>
+        function calculateBMI() {
+            const weightInput = document.getElementById('weight').value;
+            const heightInput = document.getElementById('height').value;
+            const errorMsg = document.getElementById('error-msg');
+            const resultContainer = document.getElementById('result-container');
+
+            const weight = parseFloat(weightInput);
+            const heightCm = parseFloat(heightInput);
+
+            if (isNaN(weight) || isNaN(heightCm) || weight <= 0 || heightCm <= 0) {
+                errorMsg.style.display = 'block';
+                resultContainer.style.display = 'none';
+                return;
+            }
+
+            errorMsg.style.display = 'none';
+
+            const heightM = heightCm / 100;
+            const bmi = weight / (heightM * heightM);
+            const bmiRounded = bmi.toFixed(1);
+
+            let status = '';
+            let color = '';
+
+            if (bmi < 18.5) {
+                status = 'Underweight';
+                color = '#3498db';
+            } else if (bmi >= 18.5 && bmi < 24.9) {
+                status = 'Normal Weight';
+                color = '#2ecc71';
+            } else if (bmi >= 25 && bmi < 29.9) {
+                status = 'Overweight';
+                color = '#f39c12';
+            } else {
+                status = 'Obese';
+                color = '#e74c3c';
+            }
+
+            document.getElementById('bmi-value').textContent = bmiRounded;
+            
+            const statusElement = document.getElementById('bmi-status');
+            statusElement.textContent = status;
+            statusElement.style.backgroundColor = color;
+
+            resultContainer.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
